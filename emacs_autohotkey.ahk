@@ -38,8 +38,7 @@ SetKeyDelay 0
 global keys
 := {"globalOverride"
   : {"ctrl"
-    : {"t": ["!{Esc}", False, ""]
-      ,"j": ["{Ctrl up}{LWin}", False, ""] }}
+    : {"t": ["!{Esc}", False, ""] }} ; Easier to type alt-tab
  , "globalEmacs"
     : {"ctrl"
       : {"a": ["{Home}", True, ""]
@@ -54,14 +53,16 @@ global keys
         ,"p": ["{Up}", True, ""]
         ,"r": ["^f", False, ""]
         ,"s": ["^f", False, ""]
-        ,"v": ["{PgDown}", True, ""]
+        ,"v": ["{PgDn}", True, ""]
         ,"w": ["^x", False, ""]
         ,"x": ["", False, "MacroStartCtrlX"]
         ,"y": ["^v", False, ""]
-        ,"space": ["", True, "MacroCtrlSpace"] }
+        ,"/": ["^z", False, ""]
+        ,"Space": ["", True, "MacroCtrlSpace"]
+        ,"Backspace": ["^+{Left}^x", False,""] }
     , "ctrlXPrefix"
-      : {"f": ["^o", False, ""]
-        ,"g": ["^f", False, ""]
+      : {"c": ["!{F4}", False, ""]
+        ,"f": ["^o", False, ""]
         ,"h": ["^a", False, ""]
         ,"k": ["!{F4}", False, ""]
         ,"r": ["{F5}", False, ""]
@@ -70,21 +71,18 @@ global keys
         ,"w": ["{F12}", False, ""] }
     , "alt"
       : {"f": ["^{Right}", True, ""]
-        ,"n": ["^n", False, ""]
         ,"v": ["{PgUp}", True, ""]
         ,"w": ["^c", False, ""]
-        ,"y": ["^v", False, ""] }
+        ,"y": ["^v", False, ""]
+        ,"Backspace": ["^z", False, ""] }
    , "altShift"
       : {".": ["^{End}", True, ""]
        , ",": ["^{Home}", True, ""] }}
  , "chrome.exe"
    : {"ctrlXPrefix"
      : {"b": ["^o", False, ""]
-      , "d": ["^+j", False, ""]
       , "k": ["^w", False, ""]
-      , "f": ["^l", False, ""] }
-    , "alt"
-      : {"n": ["^t", False, ""] }}}
+      , "f": ["^l", False, ""] }}}
 
 global appsWithNativeEmacsKeybindings = ["emacs.exe", "rubymine64.exe", "conemu64.exe"]
 global ctrlXActive := False
@@ -142,7 +140,10 @@ global ctrlSpaceActive := False
 !x::
 !y::
 !z::
+^/::
 ^Space::
+^Backspace::
+!Backspace::
 !+,::
 !+.::
 ProcessKeystrokes(A_ThisHotkey)
@@ -250,9 +251,13 @@ ParseMods(keystrokes)
 ; @return String keys such as c
 ParseKey(keystrokes)
 {
-  If InStr(keystrokes, "Space")
+  If InStr(keystrokes, "Backspace")
   {
-    Return "space"
+    Return "Backspace"
+  }
+  Else If InStr(keystrokes, "Space")
+  {
+    Return "Space"
   }
 
   StringRight, letter, keystrokes, 1
@@ -278,7 +283,11 @@ AddShift(mods, ctrlSpaceSensitive)
 ; @param keystrokes String original keystrokes
 Passthrough(keystrokes)
 {
-    If InStr(keystrokes, "Space")
+    If InStr(keystrokes, "Backspace")
+    {
+      Send ^{Backspace}
+    }
+    Else If InStr(keystrokes, "Space")
     {
       Send ^{Space}
     }
@@ -376,7 +385,6 @@ ClearCtrlX()
 MacroKillLine()
 {
   Send {ShiftDown}{END}{ShiftUp}
-  Sleep 50
   Send ^x
   Send {Del}
 }

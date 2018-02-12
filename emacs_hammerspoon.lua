@@ -32,7 +32,6 @@ local keys = {
   ['globalOverride'] = {
     ['ctrl'] = {
       ['t'] = {nil, nil, false, 'macroAltTab'},
-      ['j'] = {'cmd', 'space', false, nil}
     }
   },
   ['globalEmacs'] = {
@@ -52,26 +51,26 @@ local keys = {
       ['v'] = {nil, 'pagedown', true, nil},
       ['w'] = {'cmd', 'x', false, nil},
       ['x'] = {nil, nil, false, 'macroStartCtrlX'},
-      ['y'] = {'cmd', 'v', false, nil},                        
+      ['y'] = {'cmd', 'v', false, nil},
+      ['/'] = {'cmd', 'z', false, nil},
       ['space'] = {nil, nil, true, 'macroCtrlSpace'},
+      ['delete'] = {nil, nil, false, 'macroBackwardsKillWord'},      
     },
     ['ctrlXPrefix'] = {
       ['c'] = {'cmd', 'q', false, nil},      
       ['f'] = {'cmd', 'o', false, nil},
-      ['g'] = {'cmd', 'f', false, nil},      
       ['h'] = {'cmd', 'a', false, nil},
       ['k'] = {'cmd', 'w', false, nil},
-      ['r'] = {'cmd', 'r', false, nil},      
       ['s'] = {'cmd', 's', false, nil},
       ['u'] = {'cmd', 'z', false, nil},
       ['w'] = {{'shift', 'cmd'}, 's', false, nil},      
     },
     ['alt'] = {
       ['f'] = {'alt', 'f', true, nil},
-      ['n'] = {'cmd', 'n', false, nil},
       ['v'] = {nil, 'pageup', true, nil},
       ['w'] = {'cmd', 'c', false, nil},
-      ['y'] = {'cmd', 'v', false, nil},            
+      ['y'] = {'cmd', 'v', false, nil},
+      ['delete'] = {'cmd', 'z', false, nil},                  
     },
     ['altShift'] = {
       ['.'] = {'cmd', 'down', true, nil},
@@ -81,12 +80,8 @@ local keys = {
   ['Google Chrome'] = {
     ['ctrlXPrefix'] = {
       ['b'] = {'cmd', 'b', false, nil},
-      ['d'] = {{'cmd', 'alt'}, 'j', false, nil}, 
       ['f'] = {'cmd', 'l', false, nil},
       ['k'] = {'cmd', 'w', false, nil},      
-    },
-    ['alt'] = {
-      ['n'] = {'cmd', 't', false, nil},            
     }
   }
 }
@@ -236,7 +231,8 @@ end
 --- Assign keybindings to every keys
 function assignKeys()
   all_keys = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'space'}
+              'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+              '/', 'space', 'delete'}
   
   for i, key in ipairs(all_keys) do
     globalEmacsMap:bind('ctrl', key, processKeystrokes('ctrl', key), nil)
@@ -315,8 +311,14 @@ function macroStartCtrlX()
   hs.timer.doAfter(0.75,function() ctrlXActive = false end)
 end
 
+-- Kill a word behind the cursor and put it in the clipboard
+function macroBackwardsKillWord()
+  tapKey({'shift', 'alt'}, 'left')
+  tapKey('cmd', 'x')  
+end
+
 print('---------------------------------')
-print('Starting Emacs hammerspoon Script')
+print('Starting Emacs Hammerspoon Script')
 
 assignKeys()
 
@@ -326,5 +328,3 @@ chooseKeyMap()
 
 local appWatcher = hs.application.watcher.new(appWatcherFunction)
 appWatcher:start()
-
-
