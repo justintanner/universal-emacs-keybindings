@@ -10,7 +10,8 @@
 ; Installation
 ; 1) Download and Install AutoHotkey https://autohotkey.com/
 ; 2) Launch emacs_autohotkey.ahk
-; 3) Add emacs_authotkey to your Windows startup script.
+; 3) Add emacs_authotkey.ahk to your Windows startup script.
+;    Checkout this guide: https://www.maketecheasier.com/schedule-autohotkey-startup-windows/
 
 ; Customization
 ; To customize the keybindings modfiy the global "keys" below. AutoHotkey is a little fussy about whitespace, so please

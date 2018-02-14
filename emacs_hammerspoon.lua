@@ -5,11 +5,11 @@
 
 -- What does this script do?
 -- Allows you to have *most* Emacs keybindings in other apps.
--- Ctrl-Space space be used to mark and cut text just like Emacs. Also enables Emacs prefix keys such as Ctrl-xs (save).
+-- Ctrl-Space space be used to mark and cut text just like in Emacs. Also enables Emacs prefix keys such as Ctrl-xs (save).
 
 -- Installation
 -- 1) Download and hammerspoon http://www.hammerspoon.org/
--- 2) Copy emacs_hammerspoon.lua to ~/.hammerspoon/init.lua (or import emacs_hammerspoon.lue into your exisiting inti.lua)
+-- 2) Copy emacs_hammerspoon.lua to ~/.hammerspoon/init.lua (or import emacs_hammerspoon.lua into your exisiting inti.lua)
 -- 3) Start Hammerspoon
 
 -- Customization
