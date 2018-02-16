@@ -1,10 +1,10 @@
 # Universal Emacs Keybindings
 
-A collection of scripts that bring **most** Emacs keybindings to Mac OSX and Windows.
+Scripts that bring **most** Emacs keybindings to Mac OSX and Windows.
 
 ## Features
 
-* Ctrl-Space space be used to mark and cut text
+* Ctrl-Space space be used to preform Emacs style text selection in other apps
 * Supports Emacs prefix keys such as Ctrl-xs (save)
 * Allows you to specify app specific overrides (Google Chrome)
 * Apps with native Emacs keybindings are behave as normal
@@ -27,28 +27,62 @@ Both Windows and Mac OSX use the global `keys` to configure keybindings.
 
 ### Namespaces
 
-Both scripts use namespaces to send different commands to different apps.
+Namespaces are used inside `keys` send different keys to different appps.
 
-`globalEmacs` Emacs like keybinding used in all app except Emacs
-`globalOverride` contains keybindings that override all other apps including Emacs
+`globalEmacs` sends Emacs like keybinding to all non-Emacs apps
+`globalOverride` overrides Emacs and all apps
+`appName/execName` sends app specific overrides
 
 ### The `keys` syntax and mark sentivitiy
 
-To bring Emacs style marking and cutting The keybindings use the following pattern:
+Keybindings are structure with the following pattern:
 
-1. Modifier keys such as `ctrl, alt, alt+shift, ...`
-2. Non-modifier key such as `a,b,c, space, /, ...`
-3. Modifiers and non-modifiers to translate to
-4. Boolean indicating if the keybinding will maintain a mark (aka selection) or cancel the selection
-5. A macro to run instead of a keybinding
+1. Namespace
+2. Source modifier keys such as `ctrl, alt, alt+shift, ...`
+3. Source non-modifier key such as `a,b,c, space, /, ...`
+4. Destination Modifiers and non-modifiers keys
+5. A boolean indicating if the keybinding will maintain a text selection
+6. Run a macro to run instead of a translating a keys
 
-### Syntax Example (Windows)
+### Windows AutoHotkey keys syntax example
 
 ```
-"globalEmacs" : { "ctrl" { "a": ["{Home}", False, ""] } }
+"globalEmacs" : { "ctrl" { "a": ["{Home}", True, ""] } }
 ```
 
-This keybinding states, for all apps other than Emacs map Ctrl+a to Home and maintain any mark previously set while editing text.
+1. `globalEmacs` means this keybinding is for all non-Emacs apps
+2. Translate the modifier key `Ctrl`
+3. Translate the key `a`
+4. Destination keys are `Home`
+5. `True` tells the script to maintain the current text selection if currently selecting
+6. No macro to run for this keybinding
+
+### Mac OSX hammerspoon keys syntax example
+
+```
+['globalEmacs'] = { ["ctrl"] = { ['delete'] = {nil, nil, false, 'macroBackwardsKillWord'} } }
+```
+
+1. `globalEmacs` means this keybinding is for all non-Emacs apps
+2. Translate the modifier key `Ctrl`
+3. Translate the key `delete` (or Backspace)
+4. No destination modifier or key
+5. `false` tells the script to cancel a text selection if already started
+6. run the macro `macroBackwardsKillWord` (which runs multiple keys presses)
+
+### Leave apps that already have Emacs keybindings alone
+
+In Hammerspoon add name of your app to the following list:
+
+```
+local appsWithNativeEmacsKeybindings = { 'emacs', 'terminal' }
+```
+
+In Autohotkey add the name of your app's exec to the following list:
+
+```
+global appsWithNativeEmacsKeybindings = ["emacs.exe", "conemu64.exe"]
+```
 
 ## These scripts were inspired by
 

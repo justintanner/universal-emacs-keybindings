@@ -3,31 +3,6 @@
 -- Email: work@jwtanner.com
 -- License: MIT
 
--- What does this script do?
--- Allows you to have *most* Emacs keybindings in other apps.
--- Ctrl-Space space be used to mark and cut text just like in Emacs. Also enables Emacs prefix keys such as Ctrl-xs (save).
-
--- Installation
--- 1) Download and hammerspoon http://www.hammerspoon.org/
--- 2) Copy emacs_hammerspoon.lua to ~/.hammerspoon/init.lua (or import emacs_hammerspoon.lua into your exisiting inti.lua)
--- 3) Start Hammerspoon
-
--- Customization
--- To customize the keybindings modfiy the global "keys" below.
-
--- Namespaces
--- This script uses namespaces to send different commands to different apps.
--- "globalOverride" contains keybindings that override all other apps (including Emacs)
--- "globalEmacs" brings Emacs style keybindings to all other apps
--- "Google Chrome" (and app names) specifies app specific keybindings taking precendence over "globalEmacs"
-
--- Syntax Example
--- ['globalEmacs'] = { ["ctrl"] = { ['f'] = {nil, 'right', true, nil} } }
--- This keybinding states, for all apps other than Emacs map Ctrl+f to the right arrow key. true maintains the current mark (if set).
-
--- ['globalEmacs'] = { ["ctrl"] = { ['x'] = {nil, nil, false, 'macroStartCtrlX'} } }
--- This keybinding states, for all apps other than Emacs map Ctrl+x to a macro called "macroStartCtrlX" and unset any previous mark.
-
 local keys = {
   ['globalOverride'] = {
     ['ctrl'] = {
@@ -86,12 +61,7 @@ local keys = {
   }
 }
 
-local appsWithNativeEmacsKeybindings = {
-  'emacs',
-  'rubymine',
-  'terminal'
-}
-
+local appsWithNativeEmacsKeybindings = { 'emacs', 'terminal' }
 local ctrlXActive = false
 local ctrlSpaceActive = false
 local currentApp = nil
