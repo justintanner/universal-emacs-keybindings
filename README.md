@@ -27,15 +27,15 @@ Both Windows and Mac OSX use the global `keys` to configure keybindings.
 
 ### Namespaces
 
-Namespaces are used inside `keys` send different keys to different appps.
+Namespaces are used inside `keys` send different keys to different apps.
 
-`globalEmacs` sends Emacs like keybinding to all non-Emacs apps
+`globalEmacs` sends Emacs like keybindings to all non-Emacs apps
 `globalOverride` overrides Emacs and all apps
 `appName/execName` sends app specific overrides
 
 ### The `keys` syntax and mark sentivitiy
 
-Keybindings are structure with the following pattern:
+Keybindings are structured in the following pattern:
 
 1. Namespace
 2. Source modifier keys such as `ctrl, alt, alt+shift, ...`
