@@ -4,10 +4,10 @@ Scripts that bring **most** Emacs keybindings to Mac OSX and Windows.
 
 ## Features
 
-* Ctrl-Space space be used to preform Emacs style text selection in other apps
+* Ctrl-Space can be used to preform Emacs style text selection outside of Emacs
 * Supports Emacs prefix keys such as Ctrl-xs (save)
 * Allows you to specify app specific overrides (Google Chrome)
-* Apps with native Emacs keybindings are behave as normal
+* Apps with native Emacs keybindings are left alone
 
 ## Installation for Mac OSX
 
@@ -25,17 +25,17 @@ Scripts that bring **most** Emacs keybindings to Mac OSX and Windows.
 
 Both Windows and Mac OSX use the global `keys` to configure keybindings.
 
-### Namespaces
+### Keybindings namespaces
 
-Namespaces are used inside `keys` send different keys to different apps.
+Namespaces are used inside `keys` to send different keys to different apps.
 
 `globalEmacs` sends Emacs like keybindings to all non-Emacs apps
-`globalOverride` overrides Emacs and all apps
-`appName/execName` sends app specific overrides
+`globalOverride` overrides all app including Emacs
+`appName/execName` overrides `globalEmacs` with app specific customizations
 
 ### The `keys` syntax and mark sentivitiy
 
-Keybindings are structured in the following pattern:
+The `keys` variable is structured using the following pattern:
 
 1. Namespace
 2. Source modifier keys such as `ctrl, alt, alt+shift, ...`
@@ -44,7 +44,7 @@ Keybindings are structured in the following pattern:
 5. A boolean indicating if the keybinding will maintain a text selection
 6. Run a macro to run instead of a translating a keys
 
-### Windows AutoHotkey keys syntax example
+### Windows AutoHotkey `keys` syntax example
 
 ```
 "globalEmacs" : { "ctrl" { "a": ["{Home}", True, ""] } }
@@ -57,7 +57,7 @@ Keybindings are structured in the following pattern:
 5. `True` tells the script to maintain the current text selection if currently selecting
 6. No macro to run for this keybinding
 
-### Mac OSX hammerspoon keys syntax example
+### Mac OSX hammerspoon `keys` syntax example
 
 ```
 ['globalEmacs'] = { ["ctrl"] = { ['delete'] = {nil, nil, false, 'macroBackwardsKillWord'} } }
@@ -70,7 +70,7 @@ Keybindings are structured in the following pattern:
 5. `false` tells the script to cancel a text selection if already started
 6. run the macro `macroBackwardsKillWord` (which runs multiple keys presses)
 
-### Leave apps that already have Emacs keybindings alone
+### Whitelist apps that already have Emacs keybindings
 
 In Hammerspoon add name of your app to the following list:
 
