@@ -3,15 +3,45 @@
 ; Email: work@jwtanner.com
 ; License: MIT
 
+; What does this script do?
+; Allows you to have *most* Emacs keybindings in other apps.
+; Ctrl-Space space be used to mark and cut text just like Emacs. Also enables Emacs prefix keys such as Ctrl-xs (save).
+
+; Installation
+; 1) Download and Install AutoHotkey https://autohotkey.com/
+; 2) Launch emacs_autohotkey.ahk
+; 3) Set emacs_authotkey.ahk to start on boot.
+
+; Customization
+; To customize the keybindings modfiy the global "keys" below. AutoHotkey is a little fussy about whitespace, so please
+; follow the syntax of the existing data structure exactly without adding whitespace or newlines.
+
+; Namespaces
+; This script orangizes its keybindings into namespaces to send different commands to different apps.
+; "globalOverride" contains keybindings that override all other apps (including Emacs)
+; "globalEmacs" brings Emacs style keybindings to all other apps
+; "chrome.exe" (and other EXE names) specifies app specific keybindings taking precendence over "globalEmacs"
+
+; Syntax Example
+; "globalEmacs" : { "ctrl" { "a": ["{Home}", False, ""] } }
+; This keybinding states, for all apps other than Emacs map Ctrl+a to Home and maintain any mark previously set while editing text.
+
+; "globalEmacs" : { "ctrl" { "k": ["", False, "MacroKillLine"] } }
+; This keybinding states, for all apps other than Emacs map Ctrl+k to a macro called "MacroKillLine" (defined in a function) and unset
+; any mark previously set.
+
 #SingleInstance
 #Installkeybdhook
 #UseHook
 SetKeyDelay 0
 
+; Uncomment this line if you wish ctrl+t to activate the Alt+Tab app switcher on windows.
+;LCtrl & t::AltTab
+
 global keys
 := {"globalOverride"
   : {"ctrl"
-    : {"t": ["!{Esc}", False, ""] }} ; Easier to type alt-tab
+    : {"j": ["^{Esc}", False, ""] } }
  , "globalEmacs"
     : {"ctrl"
       : {"a": ["{Home}", True, ""]
@@ -20,6 +50,7 @@ global keys
         ,"e": ["{End}", True, ""]
         ,"f": ["{Right}", True, ""]
         ,"g": ["{Escape}", False, ""]
+        ,"h": ["", False, ""]
         ,"k": ["", False, "MacroKillLine"]
         ,"n": ["{Down}", True, ""]
         ,"o": ["{Enter}", False, ""]
@@ -36,6 +67,7 @@ global keys
     , "ctrlXPrefix"
       : {"c": ["!{F4}", False, ""]
         ,"f": ["^o", False, ""]
+        ,"g": ["^f", False, ""]
         ,"h": ["^a", False, ""]
         ,"k": ["!{F4}", False, ""]
         ,"r": ["{F5}", False, ""]
@@ -44,6 +76,7 @@ global keys
         ,"w": ["{F12}", False, ""] }
     , "alt"
       : {"f": ["^{Right}", True, ""]
+        ,"n": ["^n", False, ""]
         ,"v": ["{PgUp}", True, ""]
         ,"w": ["^c", False, ""]
         ,"y": ["^v", False, ""]
@@ -54,10 +87,13 @@ global keys
  , "chrome.exe"
    : {"ctrlXPrefix"
      : {"b": ["^o", False, ""]
+      , "d": ["^+j", False, ""]
       , "k": ["^w", False, ""]
-      , "f": ["^l", False, ""] }}}
+      , "f": ["^l", False, ""] }
+    , "alt"
+      : {"n": ["^t", False, ""] }}}
 
-global appsWithNativeEmacsKeybindings = ["emacs.exe", "conemu64.exe"]
+global appsWithNativeEmacsKeybindings = ["emacs.exe", "rubymine64.exe", "conemu64.exe"]
 global ctrlXActive := False
 global ctrlSpaceActive := False
 
@@ -80,7 +116,6 @@ global ctrlSpaceActive := False
 ^q::
 ^r::
 ^s::
-^t::
 ^u::
 ^v::
 ^w::
@@ -128,6 +163,7 @@ ProcessKeystrokes(keystrokes)
 {
   mods := ParseMods(keystrokes)
   key := ParseKey(keystrokes)
+  ;MsgBox %mods% %key%
   namespace := CurrentNamespace(mods, key)
 
   If (IsEmacs() && namespace != "globalOverride")
@@ -200,6 +236,10 @@ ParseMods(keystrokes)
   {
     Return "altShift"
   }
+  Else If InStr(keystrokes, "LCtrl")
+  {
+    Return "ctrl"
+  }
   Else If InStr(keystrokes, "^")
   {
     If (ctrlXActive)
@@ -224,7 +264,11 @@ ParseMods(keystrokes)
 ; @return String keys such as c
 ParseKey(keystrokes)
 {
-  If InStr(keystrokes, "Backspace")
+  If InStr(keystrokes, "& t")
+  {
+    Return "t"
+  }
+  Else If InStr(keystrokes, "Backspace")
   {
     Return "Backspace"
   }
