@@ -35,9 +35,6 @@
 #UseHook
 SetKeyDelay 0
 
-; Uncomment this line if you wish ctrl+t to activate the Alt+Tab app switcher on windows.
-;LCtrl & t::AltTab
-
 global keys
 := {"globalOverride"
   : {"ctrl"
@@ -96,6 +93,9 @@ global keys
 global appsWithNativeEmacsKeybindings = ["emacs.exe", "rubymine64.exe", "conemu64.exe"]
 global ctrlXActive := False
 global ctrlSpaceActive := False
+
+; Uncomment this line if you wish ctrl+t to activate the Alt+Tab app switcher on windows.
+;LCtrl & t::AltTab
 
 ^a::
 ^b::
