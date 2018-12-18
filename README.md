@@ -85,7 +85,7 @@ In Autohotkey add the name of your app's exec to the following list:
 global appsWithNativeEmacsKeybindings = ["emacs.exe", "conemu64.exe"]
 ```
 
-## Special thanks to the following scrips for inspiration:
+## Special thanks to the following scripts for inspiration:
 
 * https://gist.github.com/dulm/ee5ec47cfd2a71ded0e3841ee04e6ea3
 * https://github.com/usi3/emacs.ahk
