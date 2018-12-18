@@ -36,10 +36,7 @@
 SetKeyDelay 0
 
 global keys
-:= {"globalOverride"
-  : {"ctrl"
-    : {"j": ["^{Esc}", False, ""] } }
- , "globalEmacs"
+:= {"globalEmacs"
     : {"ctrl"
       : {"a": ["{Home}", True, ""]
         ,"b": ["{Left}", True, ""]
@@ -48,6 +45,7 @@ global keys
         ,"f": ["{Right}", True, ""]
         ,"g": ["{Escape}", False, ""]
         ,"h": ["", False, ""]
+        ,"j": ["", True, ""]
         ,"k": ["", False, "MacroKillLine"]
         ,"n": ["{Down}", True, ""]
         ,"o": ["{Enter}", False, ""]
@@ -56,7 +54,6 @@ global keys
         ,"s": ["^f", False, ""]
         ,"v": ["{PgDn}", True, ""]
         ,"w": ["^x", False, ""]
-        ,"x": ["", False, "MacroStartCtrlX"]
         ,"y": ["^v", False, ""]
         ,"/": ["^z", False, ""]
         ,"Space": ["", True, "MacroCtrlSpace"]
@@ -80,22 +77,31 @@ global keys
         ,"Backspace": ["^z", False, ""] }
    , "altShift"
       : {".": ["^{End}", True, ""]
-       , ",": ["^{Home}", True, ""] }}
- , "chrome.exe"
-   : {"ctrlXPrefix"
-     : {"b": ["^o", False, ""]
-      , "d": ["^+j", False, ""]
-      , "k": ["^w", False, ""]
-      , "f": ["^l", False, ""] }
-    , "alt"
-      : {"n": ["^t", False, ""] }}}
+       , ",": ["^{Home}", True, ""] } } }
+
+keys["chrome.exe"]
+:= {"ctrlXPrefix"
+   : {"b": ["^o", False, ""]
+    , "d": ["^+j", False, ""]
+    , "f": ["^l", False, ""]
+    , "k": ["^w", False, ""] }
+  , "alt"
+   : {"n": ["^t", False, ""] } }
+
+keys["globalOverride"]
+:= {"ctrl"
+    : {"x": ["", False, "MacroStartCtrlX"] }
+  , "ctrlXPrefix"
+    : {"j": ["^{Esc}", False, ""]
+     , "t": ["!{Space}", False, ""]
+     , "]": ["^#{Right}", False, ""]
+     , "[": ["^#{Left}", False, ""] }
+  , "alt"
+    : {"m": ["{LWin down}{Up}{LWin up}", False, ""] } }
 
 global appsWithNativeEmacsKeybindings = ["emacs.exe", "rubymine64.exe", "conemu64.exe"]
 global ctrlXActive := False
 global ctrlSpaceActive := False
-
-; Uncomment this line if you wish ctrl+t to activate the Alt+Tab app switcher on windows.
-;LCtrl & t::AltTab
 
 ^a::
 ^b::
@@ -116,12 +122,15 @@ global ctrlSpaceActive := False
 ^q::
 ^r::
 ^s::
+^t::
 ^u::
 ^v::
 ^w::
 ^x::
 ^y::
 ^z::
+^[::
+^]::
 !a::
 !b::
 !c::
@@ -154,6 +163,7 @@ global ctrlSpaceActive := False
 !Backspace::
 !+,::
 !+.::
+!^t::
 ProcessKeystrokes(A_ThisHotkey)
 Return
 
@@ -163,22 +173,15 @@ ProcessKeystrokes(keystrokes)
 {
   mods := ParseMods(keystrokes)
   key := ParseKey(keystrokes)
-  ;MsgBox %mods% %key%
   namespace := CurrentNamespace(mods, key)
 
-  If (IsEmacs() && namespace != "globalOverride")
-  {
-    Passthrough(keystrokes)
-    Return
-  }
-
-  If KeybindingExists(namespace, mods, key)
+  If TranslationNeeded(namespace, mods, key)
   {
     LookupAndTranslate(namespace, mods, key)
   }
   Else
   {
-    Passthrough(keystrokes)
+    SendWithoutTranslation(keystrokes)
   }
 
   Return
@@ -197,13 +200,13 @@ LookupAndTranslate(namespace, mods, key)
 
   If (toMacro && (toMacro != ""))
   {
-    ; MsgBox Executing a macro: %toMacro%
+    OutputDebug Executing a macro: %toMacro%
     %toMacro%()
   }
   Else
   {
     toKey := AddShift(toKey, ctrlSpaceSensitive)
-    ; MsgBox Sending: %toMods%%toKey%
+    OutputDebug Translating: %mods% %key% to: %toKey%
     Send %toKey%
   }
 
@@ -227,20 +230,21 @@ KeybindingExists(namespace, mods, key)
   Return (keys[namespace] && keys[namespace][mods] && keys[namespace][mods][key])
 }
 
-; Parses out the modifiers from a keystrokes strings ommiting the key
+; Determines if a keystroke translation is needed
+; @param namespace String namespace of the keybinding (eg globalEmacs, chrome.exe, etc)
+; @param mods String modifier keys such as alt, ctrl, ctrlXPrefix, etc
+; @param key String key such as a, b, c, etc
+TranslationNeeded(namespace, mods, key)
+{
+  Return (KeybindingExists("globalOverride", mods, key) || (!CurrentAppIsEmacs() && KeybindingExists(namespace, mods, key)))
+}
+
+; Find out what modify the user typed and translate it for use with the key map
 ; @param keystroke String contains autohotkey keystrokes such as ^c
 ; @return String translated modifiers such as ctrl or alt
 ParseMods(keystrokes)
 {
-  If InStr(keystrokes, "!+")
-  {
-    Return "altShift"
-  }
-  Else If InStr(keystrokes, "LCtrl")
-  {
-    Return "ctrl"
-  }
-  Else If InStr(keystrokes, "^")
+  If InStr(keystrokes, "^")
   {
     If (ctrlXActive)
     {
@@ -250,6 +254,10 @@ ParseMods(keystrokes)
     {
       Return "ctrl"
     }
+  }
+  Else If InStr(keystrokes, "!+")
+  {
+    Return "altShift"
   }
   Else If InStr(keystrokes, "!")
   {
@@ -264,11 +272,7 @@ ParseMods(keystrokes)
 ; @return String keys such as c
 ParseKey(keystrokes)
 {
-  If InStr(keystrokes, "& t")
-  {
-    Return "t"
-  }
-  Else If InStr(keystrokes, "Backspace")
+  If InStr(keystrokes, "Backspace")
   {
     Return "Backspace"
   }
@@ -295,28 +299,30 @@ AddShift(mods, ctrlSpaceSensitive)
 
   Return mods
 }
-
 ; Execute original keystrokes without translating
 ; @param keystrokes String original keystrokes
-Passthrough(keystrokes)
+SendWithoutTranslation(keystrokes)
 {
-    If InStr(keystrokes, "Backspace")
-    {
-      Send ^{Backspace}
-    }
-    Else If InStr(keystrokes, "Space")
-    {
-      Send ^{Space}
-    }
-    Else
-    {
-      Send %keystrokes%
-    }
+  OutputDebug Sending *un-translated* keystrokes: %keystrokes%
+
+  ; Send ^Backpace and ^Space don't seem to work, needed to re-add the curly braces.
+  If (keystrokes == "^Backspace")
+  {
+    Send ^{Backspace}
+  }
+  Else If (keystrokes == "^Space")
+  {
+    Send ^{Space}
+  }
+  Else
+  {
+    Send %keystrokes%
+  }
 }
 
 ; Does the current app already have Emacs keybinings
 ; @return Boolean true if Emacs
-IsEmacs()
+CurrentAppIsEmacs()
 {
   For index, appName in appsWithNativeEmacsKeybindings
   {
@@ -378,7 +384,7 @@ CurrentApp()
   Return exeName
 }
 
-; Start a selection mark in a non Emacs app
+; Start text selection in a non Emacs app
 MacroCtrlSpace()
 {
   ctrlSpaceActive := True
@@ -390,6 +396,11 @@ MacroStartCtrlX()
 {
   ctrlXActive := True
   SetTimer, ClearCtrlX, -750
+
+  If (CurrentAppIsEmacs())
+  {
+    Send ^x
+  }
 }
 
 ; Clears Ctrl-x prefix state, invoked by the timer above.
