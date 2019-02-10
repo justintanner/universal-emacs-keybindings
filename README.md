@@ -2,6 +2,8 @@
 
 Use the Emacs keybindings you love across all applications for mac and windows. 
 
+![example image](https://images.tuckdb.org/postcards/images/000/198/275/extra_large/2012_01_23_14_06_35.jpg)
+
 ## Features
 
 * Ctrl-Space can be used to preform Emacs style text selection outside of Emacs
