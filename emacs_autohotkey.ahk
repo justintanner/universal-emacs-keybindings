@@ -412,7 +412,7 @@ ClearCtrlX()
 ; Macro to kill a line and add it to the clipboard
 MacroKillLine()
 {
-  Send {ShiftDown}{END}{ShiftUp}
+  Send {HOME}{ShiftDown}{END}{ShiftUp}
   Send ^x
   Send {Del}
 }
