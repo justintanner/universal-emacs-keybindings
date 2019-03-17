@@ -38,7 +38,6 @@ local keys = {
       ['f'] = {nil, 'right', true, nil},
       ['g'] = {nil, 'escape', false, nil},
       ['h'] = {nil, nil, false, nil},
-      ['j'] = {nil, nil, false, nil},      
       ['k'] = {'ctrl', 'k', false, nil},      
       ['n'] = {nil, 'down', true, nil},
       ['o'] = {nil, 'return', false, nil},
@@ -64,7 +63,7 @@ local keys = {
       ['w'] = {{'shift', 'cmd'}, 's', false, nil},      
     },
     ['alt'] = {
-      ['f'] = {'alt', 'f', true, nil},
+      ['f'] = {'alt', 'right', true, nil},
       ['n'] = {'cmd', 'n', false, nil},
       ['v'] = {nil, 'pageup', true, nil},
       ['w'] = {'cmd', 'c', false, nil},
@@ -236,6 +235,8 @@ end
 -- @param mods String modifier keys such as alt, ctrl, shift
 -- @param key String key such as a, b, c, etc
 function tapKey(mods, key)
+  if key == nil then return end
+  
   hotkeyModal:exit()
   
   hs.eventtap.event.newKeyEvent(mods, key, true):post()
