@@ -2,7 +2,7 @@
 
 Use the Emacs keybindings you love across all applications for mac and windows. 
 
-![example image](https://images.tuckdb.org/postcards/images/000/198/275/extra_large/2012_01_23_14_06_35.jpg)
+![example image](https://i.imgur.com/oTRCHVh.jpg)
 
 ## Features
 
@@ -86,6 +86,10 @@ In Autohotkey add the name of your app's exec to the following list:
 ```
 global appsWithNativeEmacsKeybindings = ["emacs.exe", "conemu64.exe"]
 ```
+
+### Blog post
+
+I wrote a [blog post](https://dev.to/justintanner/emacs-keybindings-to-rule-them-all-380b) laying out my reasons for developing these scripts.
 
 ## Special thanks to the following scripts for inspiration:
 
