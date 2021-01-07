@@ -86,14 +86,43 @@ local keys = {
       ['n'] = {'cmd', 't', false, nil},            
     }
   },
+  ['Brave Browser'] = {
+    ['ctrlXPrefix'] = {
+      ['b'] = {'cmd', 'b', false, nil},
+      ['d'] = {{'cmd', 'alt'}, 'j', false, nil}, 
+      ['f'] = {'cmd', 'l', false, nil},
+      ['k'] = {'cmd', 'w', false, nil},      
+    },
+    ['alt'] = {
+      ['n'] = {'cmd', 't', false, nil},            
+    }
+  },  
+  ['Firefox'] = {
+    ['ctrlXPrefix'] = {
+      ['b'] = {{'cmd', 'shift'}, 'o', false, nil},
+      ['d'] = {{'cmd', 'alt'}, 'k', false, nil}, 
+      ['f'] = {'cmd', 'l', false, nil},
+      ['k'] = {'cmd', 'w', false, nil},      
+    },
+    ['alt'] = {
+      ['n'] = {'cmd', 't', false, nil},
+      ['p'] = {'cmd', '\\', false, nil},
+    }
+  },
   ['Terminal'] = {
     ['ctrl'] = {
-      ['y'] = {nil, nil, false, 'macroTerminalPasteHack'},
+      ['y'] = {nil, nil, false, 'terminalPasteHack'},
     }
   },
   ['Evernote'] = {
     ['ctrlXPrefix'] = {
       ['g'] = {{'alt','cmd'}, 'f', false, nil},
+    }
+  },
+  ['Anki'] = {
+    ['ctrl'] = {
+      ['a'] = {nil, 'home', false, nil},
+      ['e'] = {nil, 'end', false, nil},
     }
   },
   ['globalOverride'] = {
@@ -107,7 +136,7 @@ local keys = {
       ['['] = {{'ctrl', 'cmd'}, '1', false, nil},            
     },
     ['alt'] = {
-      ['s'] = {{'shift', 'ctrl', 'cmd'}, '5', false, nil},
+      ['s'] = {{'shift', 'cmd'}, '5', false, nil},
     }
   }  
 }
@@ -121,6 +150,7 @@ local appsWithNativeEmacsKeybindings = {
 local ctrlXActive = false
 local ctrlSpaceActive = false
 local hotkeyModal = hs.hotkey.modal.new()
+local lastPasteboardContents = nil
 
 --- Entry point for processing keystrokes and taking the appropriate action.
 -- @param mods String modifiers such as: ctrl or alt
@@ -214,7 +244,8 @@ end
 function translationNeeded(namespace, mods, key)
   return (
     keybindingExists('globalOverride', mods, key) or
-    (not currentAppIsEmacs() and keybindingExists(namespace, mods, key)))
+      (keybindingExists(currentApp(), mods, key) and (namespace == currentApp())) or 
+      (not currentAppIsEmacs() and keybindingExists(namespace, mods, key)))
 end
 
 --- Checks the global keys table for a keybinding
@@ -328,14 +359,17 @@ function macroStartCtrlX()
   end
 end
 
--- Allows a Ctrl-y to paste into the bash terminal from the mac clipboard and within emacs from its keyboard
-function macroTerminalPasteHack()
-  local focusedWindow = hs.window.focusedWindow()
-  
-  if focusedWindow:title():match('-- emacs') then
-    tapKey('ctrl', 'y')
-  else
+function terminalPasteHack()
+  pasteboardContents = hs.pasteboard.getContents()
+
+  if pasteboardContents and (pasteboardContents ~= lastPasteboardContents) then
+    -- Paste whatever is in the OSX system clipboard
     tapKey('cmd', 'v')
+
+    lastPasteboardContents = pasteboardContents
+  else
+    -- Let the bash or emacs paste their interal clipboard
+    tapKey('ctrl', 'y')
   end
 end
 
@@ -343,6 +377,10 @@ end
 function macroBackwardsKillWord()
   tapKey({'shift', 'alt'}, 'left')
   tapKey('cmd', 'x')
+end
+
+function macroLaunchFinder()
+  hs.application.launchOrFocus('Finder')
 end
 
 print('---------------------------------')
