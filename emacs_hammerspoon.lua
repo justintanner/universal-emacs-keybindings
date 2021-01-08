@@ -150,7 +150,6 @@ local appsWithNativeEmacsKeybindings = {
 local ctrlXActive = false
 local ctrlSpaceActive = false
 local hotkeyModal = hs.hotkey.modal.new()
-local lastPasteboardContents = nil
 
 --- Entry point for processing keystrokes and taking the appropriate action.
 -- @param mods String modifiers such as: ctrl or alt
@@ -360,16 +359,12 @@ function macroStartCtrlX()
 end
 
 function terminalPasteHack()
-  pasteboardContents = hs.pasteboard.getContents()
-
-  if pasteboardContents and (pasteboardContents ~= lastPasteboardContents) then
-    -- Paste whatever is in the OSX system clipboard
-    tapKey('cmd', 'v')
-
-    lastPasteboardContents = pasteboardContents
-  else
-    -- Let the bash or emacs paste their interal clipboard
+  local focusedWindow = hs.window.focusedWindow()
+  
+  if focusedWindow:title():find('emacs') then
     tapKey('ctrl', 'y')
+  else
+    tapKey('cmd', 'v')
   end
 end
 
