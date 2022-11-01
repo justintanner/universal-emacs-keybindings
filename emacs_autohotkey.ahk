@@ -59,11 +59,9 @@ global keys
         ,"Space": ["", True, "MacroCtrlSpace"]
         ,"Backspace": ["^+{Left}^x", False,""] }
     , "ctrlXPrefix"
-      : {"c": ["!{F4}", False, ""]
-        ,"f": ["^o", False, ""]
+      : {"f": ["^o", False, ""]
         ,"g": ["^f", False, ""]
         ,"h": ["^a", False, ""]
-        ,"k": ["!{F4}", False, ""]
         ,"r": ["{F5}", False, ""]
         ,"s": ["^s", False, ""]
         ,"u": ["^z", False, ""]
@@ -74,14 +72,24 @@ global keys
         ,"v": ["{PgUp}", True, ""]
         ,"w": ["^c", False, ""]
         ,"y": ["^v", False, ""]
-        ,"Backspace": ["^z", False, ""] }
+        ,"Backspace": ["^z", False, ""]
+        ,"q": ["!{F4}", False, ""] } 
    , "altShift"
       : {".": ["^{End}", True, ""]
        , ",": ["^{Home}", True, ""] } } }
 
 keys["chrome.exe"]
 := {"ctrlXPrefix"
-   : {"b": ["^o", False, ""]
+  : {"b": ["^o", False, ""]
+    , "d": ["^+j", False, ""]
+    , "f": ["^l", False, ""]
+    , "k": ["^w", False, ""] }
+  , "alt"
+   : {"n": ["^t", False, ""] } }
+
+keys["brave.exe"]
+:= {"ctrlXPrefix"
+  : {"b": ["^o", False, ""]
     , "d": ["^+j", False, ""]
     , "f": ["^l", False, ""]
     , "k": ["^w", False, ""] }
@@ -90,19 +98,23 @@ keys["chrome.exe"]
 
 keys["globalOverride"]
 := {"ctrl"
-    : {"x": ["", False, "MacroStartCtrlX"] }
+  : { "x": ["", False, "MacroStartCtrlX"] } 
   , "ctrlXPrefix"
     : {"j": ["^{Esc}", False, ""]
      , "t": ["!{Space}", False, ""]
      , "]": ["^#{Right}", False, ""]
      , "[": ["^#{Left}", False, ""] }
   , "alt"
-    : {"m": ["{LWin down}{Up}{LWin up}", False, ""] } }
+    : {"m": ["{LWin down}{Up}{LWin up}", False, ""]
+     , "j": ["^{Esc}", False, ""]
+     , "h": ["!{Space}", False, ""] } }
 
 global appsWithNativeEmacsKeybindings = ["emacs.exe", "rubymine64.exe", "conemu64.exe"]
 global ctrlXActive := False
 global ctrlSpaceActive := False
 
+^0::
+^9::
 ^a::
 ^b::
 ^c::
@@ -227,6 +239,8 @@ LookupAndTranslate(namespace, mods, key)
 ; @param key String key such as a, b, c, etc
 KeybindingExists(namespace, mods, key)
 {
+  OutputDebug key: %key%
+
   Return (keys[namespace] && keys[namespace][mods] && keys[namespace][mods][key])
 }
 
@@ -267,6 +281,25 @@ ParseMods(keystrokes)
   Return keystrokes
 }
 
+; Does an array have a value
+; @param haystack Array of string
+; @param haystack String of value to search for
+; @return Boolean result of the search
+HasVal(haystack, needle) {
+  For index, value in haystack {
+    If (value = needle)
+    {
+      Return index
+    }
+  }
+  if !(IsObject(haystack))
+  {
+    throw Exception("Bad haystack!", -1, haystack)
+  }
+
+  Return 0
+}
+
 ; Parses out the key from a keystrokes string without the modifier
 ; @param keystroke String contains autohotkey keystrokes such as ^c
 ; @return String keys such as c
@@ -282,6 +315,14 @@ ParseKey(keystrokes)
   }
 
   StringRight, letter, keystrokes, 1
+
+  numbers := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+  If HasVal(numbers, letter)
+  {
+    Return "number" . letter
+  }
+
   Return letter
 }
 
