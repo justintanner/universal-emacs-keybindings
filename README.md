@@ -16,6 +16,8 @@ Use the Emacs keybindings you love across all applications for mac and windows.
 
 On Mac I've moved from Hammerspoon to Karabiner, I've left the legacy Hammerspoon script in the repo for reference.
 
+For more information check out my [new blog post](https://jwtanner.com/posts/hammerspoon-to-karabiner/).
+
 ## Installation for Mac
 
 1. Download and install [Karabiner-Elements](https://karabiner-elements.pqrs.org/)
@@ -28,9 +30,9 @@ On Mac I've moved from Hammerspoon to Karabiner, I've left the legacy Hammerspoo
 2. Launch `emacs_autohotkey.ahk` (notice the green system tray icon)
 3. Add `emacs_authotkey.ahk` to your Windows startup script. Checkout [this guide](https://www.maketecheasier.com/schedule-autohotkey-startup-windows/).
 
-### Blog post
+### Original post
 
-I wrote a [blog post](https://dev.to/justintanner/emacs-keybindings-to-rule-them-all-380b) laying out my reasons for developing these scripts.
+I wrote a [blog post](https://jwtanner.com/posts/emacs-keybindings-to-rule-them-all/) laying out my reasons for developing these scripts.
 
 ## Special thanks to the following scripts for inspiration:
 
